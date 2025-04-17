@@ -1,0 +1,24 @@
+﻿  fuentesDeLuz.cpp
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(189,24): warning C4244: 'inicializando': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(228,20): warning C4244: '=': conversión de 'double' a 'T'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(228,20): warning C4244:         with
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(228,20): warning C4244:         [
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(228,20): warning C4244:             T=float
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(228,20): warning C4244:         ]
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(229,20): warning C4244: '=': conversión de 'double' a 'T'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(229,20): warning C4244:         with
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(229,20): warning C4244:         [
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(229,20): warning C4244:             T=float
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(229,20): warning C4244:         ]
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(230,20): warning C4244: '=': conversión de 'double' a 'T'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(230,20): warning C4244:         with
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(230,20): warning C4244:         [
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(230,20): warning C4244:             T=float
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(230,20): warning C4244:         ]
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(461,11): warning C4244: '=': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(462,11): warning C4244: '=': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(466,18): warning C4244: 'inicializando': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(467,18): warning C4244: 'inicializando': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(469,10): warning C4244: '=': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+D:\sem 2025-2 pt2\lab graf_3\P8\p5\configIni\fuentesDeLuz.cpp(470,10): warning C4244: '=': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+  configIni.vcxproj -> D:\sem 2025-2 pt2\lab graf_3\P8\p5\Debug\configIni.exe

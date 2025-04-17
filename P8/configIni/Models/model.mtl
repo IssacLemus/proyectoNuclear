@@ -1,0 +1,35 @@
+# exported by https://3dviewer.net
+newmtl MechaPlankton_Costume_01_Mat
+Kd 0.8 0.8 0.8
+d 1
+Ka 0 0 0
+Ks 0.2 0.2 0.2
+Ns 200
+newmtl MechaPlankton_Props_Costume_01_Mat
+Kd 0.8 0.8 0.8
+d 1
+Ka 0 0 0
+Ks 0.2 0.2 0.2
+Ns 200
+newmtl MechaPlankton_Karen_Mat
+Kd 0.8 0.8 0.8
+d 1
+Ka 0 0 0
+Ks 0.2 0.2 0.2
+Ns 200
+newmtl MechaPlankton_Props
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 0.2 0.2 0.2
+Ns 200
+newmtl Plankton_Mat
+Kd 0.8 0.8 0.8
+d 1
+Ka 0 0 0
+Ks 0.2 0.2 0.2
+Ns 200
+map_Kd Plankton_BaseColor.png
+
+
+
