@@ -1,6 +1,7 @@
 // Std. Includes
 #include <string>
-
+#include <iostream>
+#include <cmath>
 // GLEW
 #include <GL/glew.h>
 
@@ -94,10 +95,10 @@ int main( )
     Shader shader( "Shader/modelLoading.vs", "Shader/modelLoading.frag" );
     
     // Load models
-	Model dog((char*)"Models/piso.obj");  
+	Model plano((char*)"Models/piso.obj");  
     glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
     
-  
+	
 
     // Game loop
     while (!glfwWindowShouldClose(window))
@@ -123,8 +124,9 @@ int main( )
 
         // Draw the loaded model
         glm::mat4 model(1);
+        model = glm::scale(model, glm::vec3(10.0f, 1.0f, 10.0f));
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        dog.Draw(shader);
+        plano.Draw(shader);
 
   
 
