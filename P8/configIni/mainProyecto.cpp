@@ -97,7 +97,7 @@ int main( )
     // Load models
 	Model plano((char*)"Models/piso.obj");  
     glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
-    
+	Model reactor((char*)"Models/reactor.obj");
 	
 
     // Game loop
@@ -128,7 +128,11 @@ int main( )
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
         plano.Draw(shader);
 
-  
+        //Reactor 1
+		model = glm::mat4(1);
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        reactor.Draw(shader);
 
         // Swap the buffers
         glfwSwapBuffers( window );
