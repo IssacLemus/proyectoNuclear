@@ -6,11 +6,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <glad/glad.h>
-
-// GLFW
 #include <GLFW/glfw3.h>
-
-// GLM: OpenGL Math library
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -22,6 +18,8 @@
 #include <material.h>
 #include <light.h>
 #include <cubemap.h>
+#include <particles.h>
+
 
 // Functions
 bool Start();
@@ -39,8 +37,7 @@ const unsigned int SCR_WIDTH = 1024;
 const unsigned int SCR_HEIGHT = 768;
 
 // Camara
-Camera camera(glm::vec3(5.0f, 4.0f, 10.0f));
-
+Camera camera(glm::vec3(5.0f, 4.0f, 12.0f));
 
 // Mouse control
 float lastX = SCR_WIDTH / 2.0f;
@@ -56,10 +53,13 @@ float elapsedTime = 0.0f;
 Shader* mLightsShader;
 Shader* cubemapShader;
 Shader* fresnelShader;
-Shader* dynamicShader;
+Shader* particlesShader;
+
+// Part culas
+Particles particlesSystem(200, glm::vec3(-5.0f, 15.0f, -50.0f));        // Torre izquierda
+Particles particlesTorreDerecha(200, glm::vec3(22.0f, 15.0f, -50.0f)); // Torre derecha
 
 // Models
-Model* lightDummy;
 Model* material_mate;
 Model* material_metalico;
 Model* material_plastico;
@@ -67,6 +67,7 @@ Model* material_translucido;
 Model* turbina;
 Model* maqCombust;
 Model* grua;
+Model* particleModel;
 
 // Cubemap
 CubeMap* mainCubeMap;
@@ -132,11 +133,9 @@ bool Start() {
     mLightsShader = new Shader("shaders/11_PhongShaderMultLights.vs", "shaders/11_PhongShaderMultLights.fs");
     cubemapShader = new Shader("shaders/10_vertex_cubemap.vs", "shaders/10_fragment_cubemap.fs");
     fresnelShader = new Shader("shaders/11_fresnel.vs", "shaders/11_fresnel.fs");
-    dynamicShader = new Shader("shaders/10_vertex_skinning-IT.vs", "shaders/10_fragment_skinning-IT.fs");
-    dynamicShader->setBonesIDs(MAX_RIGGING_BONES);
+    particlesShader = new Shader("shaders/13_particles.vs", "shaders/13_particles.fs");
 
     // Load models
-    lightDummy = new Model("models/IllumModels/lightDummy.fbx");
     material_translucido = new Model("models/IllumModels/material_translucido.fbx");
     material_mate = new Model("models/IllumModels/material_mate.fbx");
     material_metalico = new Model("models/IllumModels/material_metalico.fbx");
@@ -144,6 +143,7 @@ bool Start() {
     turbina = new Model("models/IllumModels/turbina.fbx");
     maqCombust = new Model("models/IllumModels/maqCombustible.fbx");
     grua = new Model("models/IllumModels/grua.fbx");
+    particleModel = new Model("models/IllumModels/humo.fbx");
 
     // Load cubemap
     vector<std::string> faces
@@ -158,36 +158,17 @@ bool Start() {
     mainCubeMap = new CubeMap();
     mainCubeMap->loadCubemap(faces);
 
-    // Configure lights
+    // Configurar luz
     Light light01; //Luz de la escena
     light01.Position = glm::vec3(5.0f, 15.0f, -9.0f);
     light01.Color = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
     light01.Power = glm::vec4(25.0f, 25.0f, 25.0f, 1.0f);
     gLights.push_back(light01);
 
-    //Light light02; // Luz alarma
-    //light02.Position = glm::vec3(20.5f, 3.6f, -32.3f);
-    //light02.Color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    //light02.Power = glm::vec4(10.0f, 10.0f, 10.1f, 1.0f);
-    //gLights.push_back(light02);
-
-    /*Light light03;
-    light03.Position = glm::vec3(5.0f, 2.0f, -5.0f);
-    light03.Color = glm::vec4(0.0f, 0.0f, 0.2f, 1.0f);
-    light03.Power = glm::vec4(60.0f, 60.0f, 60.0f, 1.0f);
-    gLights.push_back(light03);
-
-    Light light04;
-    light04.Position = glm::vec3(-5.0f, 2.0f, -5.0f);
-    light04.Color = glm::vec4(0.2f, 0.2f, 0.0f, 1.0f);
-    light04.Power = glm::vec4(60.0f, 60.0f, 60.0f, 1.0f);
-    gLights.push_back(light04);*/
-
-
     // Configure materials
-    material01.ambient = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);   // Mayor base de iluminación
-    material01.diffuse = glm::vec4(0.85f, 0.85f, 0.85f, 1.0f); // Buena reflexión difusa
-    material01.specular = glm::vec4(0.3f, 0.3f, 0.3f, 1.0f);    // Mate = poca especularidad
+    material01.ambient = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);   // Mayor base de iluminaci n
+    material01.diffuse = glm::vec4(0.85f, 0.85f, 0.85f, 1.0f); // Buena reflexi n difusa
+    material01.specular = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);    // Poca especularidad
     material01.transparency = 1.0f;
     return true;
 }
@@ -201,6 +182,8 @@ bool Update() {
     elapsedTime += deltaTime;
     if (elapsedTime > 1.0f / 30.0f) {
         elapsedTime = 0.0f;
+        particlesSystem.UpdatePhysics(deltaTime);
+        particlesTorreDerecha.UpdatePhysics(deltaTime);
     }
 
     // Input
@@ -216,13 +199,44 @@ bool Update() {
     projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
     view = camera.GetViewMatrix();
 
-    // Draw cubemap background
+    // Dibujar cubemap 
     {
         mainCubeMap->drawCubeMap(*cubemapShader, projection, view);
     }
 
+    // Animaci n de part culas
+    {
+        // Activaci n del shader de las part culas
+        particlesShader->use();
+        particlesShader->setMat4("projection", projection);
+        particlesShader->setMat4("view", view);
 
-    // Materiales mate y plásticos con Phong shading
+        // Activamos para objetos transparentes
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glm::mat4 model;
+        //TorreIzquierda
+        for (int psc = 0; psc < particlesSystem.particles.size(); psc++) {
+            Particle p_i = particlesSystem.particles.at(psc);
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, p_i.position);
+            model = glm::scale(model, glm::vec3(p_i.scale));
+            particlesShader->setMat4("model", model);
+            particleModel->Draw(*particlesShader);
+        }
+        //TorreDerecha
+        for (int psc = 0; psc < particlesTorreDerecha.particles.size(); psc++) {
+            Particle p_i = particlesTorreDerecha.particles.at(psc);
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, p_i.position);
+            model = glm::scale(model, glm::vec3(p_i.scale));
+            particlesShader->setMat4("model", model);
+            particleModel->Draw(*particlesShader);
+        }
+
+    }
+
+    // Materiales mate y pl sticos con Phong shading
     {
         mLightsShader->use();
         glEnable(GL_BLEND);
@@ -239,7 +253,6 @@ bool Update() {
         // Configure lights
         mLightsShader->setInt("numLights", (int)gLights.size());
         for (size_t i = 0; i < gLights.size(); ++i) {
-            // No transformar la posición de la luz aquí, manteniéndola en el espacio global
             SetLightUniformVec3(mLightsShader, "Position", i, gLights[i].Position);
             SetLightUniformVec3(mLightsShader, "Direction", i, gLights[i].Direction);
             SetLightUniformVec4(mLightsShader, "Color", i, gLights[i].Color);
@@ -260,7 +273,7 @@ bool Update() {
         material_plastico->Draw(*mLightsShader);
     }
 
-    // Dibujar materiales metálicos y translucidos con Fresnel shading (diferente refraccion de luz)
+    // Dibujar materiales met licos y translucidos con Fresnel shading (diferente refraccion de luz)
     {
         fresnelShader->use();
         glEnable(GL_BLEND);
@@ -284,7 +297,7 @@ bool Update() {
         fresnelShader->setInt("skybox", 1);
 
 
-        //Air refraction
+        //Refraccion para metalico
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -292,7 +305,7 @@ bool Update() {
         fresnelShader->setMat4("model", model);
         fresnelShader->setVec3("cameraPosition", camera.Position);
         fresnelShader->setFloat("mRefractionRatio", 1.0f / 1.003f); // Air
-        fresnelShader->setFloat("_Bias", -0.2f);
+        fresnelShader->setFloat("_Bias", -0.1f);
         fresnelShader->setFloat("_Scale", 0.15f);
         fresnelShader->setFloat("_Power", 1.0f);
         fresnelShader->setFloat("uAlpha", 1.0f); // opaco
@@ -305,17 +318,29 @@ bool Update() {
         turbModel = glm::translate(turbModel, glm::vec3(-7.0f, -27.47f, -1.15f));
         turbModel = glm::rotate(turbModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
         fresnelShader->setMat4("model", turbModel);
+        fresnelShader->setVec3("cameraPosition", camera.Position);
+        fresnelShader->setFloat("mRefractionRatio", 1.0f / 1.003f); // Air
+        fresnelShader->setFloat("_Bias", -0.1f);
+        fresnelShader->setFloat("_Scale", 0.15f);
+        fresnelShader->setFloat("_Power", 1.0f);
+        fresnelShader->setFloat("uAlpha", 1.0f); // opaco
         turbina->Draw(*fresnelShader);
 
         //Animacion maqCombustible
         float time = glfwGetTime();
-        float distance = 1.0f; // hasta dónde se mueve en cada dirección
+        float distance = 1.0f; // hasta d nde se mueve en cada direcci n
         float offset = sin(time) * distance;
         glm::mat4 movimientoModel = glm::mat4(1.0f);
         movimientoModel = glm::rotate(movimientoModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         movimientoModel = glm::translate(movimientoModel, glm::vec3(-0.0f, 0.0f, 0.0f));
         movimientoModel = glm::translate(movimientoModel, glm::vec3(offset, 0.0f, 0.0f));
         fresnelShader->setMat4("model", movimientoModel);
+        fresnelShader->setVec3("cameraPosition", camera.Position);
+        fresnelShader->setFloat("mRefractionRatio", 1.0f / 1.003f); // Air
+        fresnelShader->setFloat("_Bias", -0.1f);
+        fresnelShader->setFloat("_Scale", 0.15f);
+        fresnelShader->setFloat("_Power", 1.0f);
+        fresnelShader->setFloat("uAlpha", 1.0f); // opaco
         maqCombust->Draw(*fresnelShader);
 
         //Animacion Grua
@@ -326,36 +351,24 @@ bool Update() {
         gruaModel = glm::rotate(gruaModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         gruaModel = glm::rotate(gruaModel, angle2, glm::vec3(0.0f, 0.0f, 1.0f)); // rotar sobre Z
         fresnelShader->setMat4("model", gruaModel);
+        fresnelShader->setVec3("cameraPosition", camera.Position);
+        fresnelShader->setFloat("mRefractionRatio", 1.0f / 1.003f); // Air
+        fresnelShader->setFloat("_Bias", -0.1f);
+        fresnelShader->setFloat("_Scale", 0.15f);
+        fresnelShader->setFloat("_Power", 1.0f);
+        fresnelShader->setFloat("uAlpha", 1.0f); // opaco
         grua->Draw(*fresnelShader);
 
-        // Water refraction
+        //Refraccion para translucido
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         fresnelShader->setMat4("model", model);
         fresnelShader->setVec3("cameraPosition", camera.Position);
-        fresnelShader->setFloat("mRefractionRatio", 1.0f / 1.333f); // Water
+        fresnelShader->setFloat("mRefractionRatio", 1.0f / 1.333f); // Refracci n para simular agua
         fresnelShader->setFloat("_Bias", 0.1f);
-        fresnelShader->setFloat("_Scale", 0.1f);
+        fresnelShader->setFloat("_Scale", 0.15f);
         fresnelShader->setFloat("_Power", 1.0f);
-        fresnelShader->setFloat("uAlpha", 0.7f); // semitransparente
+        fresnelShader->setFloat("uAlpha", 0.7f); //Canal alpha para efecto semitransparente
         material_translucido->Draw(*fresnelShader);
-    }
-
-    // Draw light indicators
-    {
-        Shader basicShader("shaders/10_vertex_simple.vs", "shaders/10_fragment_simple.fs");
-        basicShader.use();
-        basicShader.setMat4("projection", projection);
-        basicShader.setMat4("view", view);
-
-        glm::mat4 model;
-        for (size_t i = 0; i < gLights.size(); ++i) {
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, gLights[i].Position);
-            model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-            basicShader.setMat4("model", model);
-            lightDummy->Draw(basicShader);
-        }
     }
 
     glUseProgram(0);
@@ -381,14 +394,6 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-
-    // Polygon modes
-    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

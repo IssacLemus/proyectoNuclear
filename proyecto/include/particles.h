@@ -38,7 +38,7 @@ public:
 			P.position = P.p0;
 
 			P.velocity = glm::vec3(
-				glm::linearRand(-0.6f, 0.6f),     // más ancho
+				glm::linearRand(-1.0f, 1.0f),     // más ancho
 				glm::linearRand(1.5f, 3.0f),      // más alto
 				glm::linearRand(-0.6f, 0.6f)
 			);
@@ -93,7 +93,7 @@ public:
 	}
 
 private:
-	glm::vec3 gravity = glm::vec3(0.0f, -0.1f, 0.0f); // puedes subir a 0.0f si quieres que floten más
+	glm::vec3 gravity = glm::vec3(0.0f, -0.1f, 0.0f); 
 	glm::vec3 emitterCenter;
 };
 
