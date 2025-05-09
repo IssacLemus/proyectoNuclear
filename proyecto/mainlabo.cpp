@@ -33,8 +33,8 @@ void processInput(GLFWwindow* window);
 
 // Globals
 GLFWwindow* window;
-const unsigned int SCR_WIDTH = 1024;
-const unsigned int SCR_HEIGHT = 768;
+const unsigned int SCR_WIDTH = 1680;
+const unsigned int SCR_HEIGHT = 1050;
 
 // Camara
 Camera camera(glm::vec3(5.0f, 4.0f, 12.0f));
