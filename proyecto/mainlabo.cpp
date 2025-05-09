@@ -298,6 +298,35 @@ bool Update() {
         fresnelShader->setFloat("uAlpha", 1.0f); // opaco
         material_metalico->Draw(*fresnelShader);
 
+        //Animacion Turbina
+        float angle = glfwGetTime();
+        glm::mat4 turbModel = glm::mat4(1.0f);
+        turbModel = glm::rotate(turbModel, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        turbModel = glm::translate(turbModel, glm::vec3(-7.0f, -27.47f, -1.15f));
+        turbModel = glm::rotate(turbModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+        fresnelShader->setMat4("model", turbModel);
+        turbina->Draw(*fresnelShader);
+
+        //Animacion maqCombustible
+        float time = glfwGetTime();
+        float distance = 1.0f; // hasta dónde se mueve en cada dirección
+        float offset = sin(time) * distance;
+        glm::mat4 movimientoModel = glm::mat4(1.0f);
+        movimientoModel = glm::rotate(movimientoModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        movimientoModel = glm::translate(movimientoModel, glm::vec3(-0.0f, 0.0f, 0.0f));
+        movimientoModel = glm::translate(movimientoModel, glm::vec3(offset, 0.0f, 0.0f));
+        fresnelShader->setMat4("model", movimientoModel);
+        maqCombust->Draw(*fresnelShader);
+
+        //Animacion Grua
+        float time2 = glfwGetTime();
+        float angle2 = time2 * 0.5;
+        glm::mat4 gruaModel = glm::mat4(1.0f);
+        gruaModel = glm::translate(gruaModel, glm::vec3(20.4f, 3.7f, -34.6f));
+        gruaModel = glm::rotate(gruaModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        gruaModel = glm::rotate(gruaModel, angle2, glm::vec3(0.0f, 0.0f, 1.0f)); // rotar sobre Z
+        fresnelShader->setMat4("model", gruaModel);
+        grua->Draw(*fresnelShader);
 
         // Water refraction
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
